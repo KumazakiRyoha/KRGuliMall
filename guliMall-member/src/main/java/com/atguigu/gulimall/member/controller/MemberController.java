@@ -46,14 +46,6 @@ public class MemberController {
         return R.ok().put("page", page);
     }
 
-    @RequestMapping("/coupons")
-    public R test(){
-        MemberEntity memberEntity = new MemberEntity();
-        memberEntity.setNickname("雨宫雅玲");
-        R membercoupons = couponFeignService.membercoupons();
-        return R.ok().put("member",memberEntity).put("coupons",membercoupons);
-    }
-
     /**
      * 信息
      */
