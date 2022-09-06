@@ -1,10 +1,14 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.common.validator.group.AddGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +20,7 @@ import com.atguigu.gulimall.product.service.BrandService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.R;
 
+import javax.validation.Valid;
 
 
 /**
@@ -59,16 +64,15 @@ public class BrandController {
      */
     @RequestMapping("/save")
  //   @RequiresPermissions("product:brand:save")
-    public R save(@RequestBody BrandEntity brand){
-		brandService.save(brand);
-
+    public R save(@Validated(AddGroup.class) @RequestBody BrandEntity brand /*BindingResult result*/){
+        brandService.save(brand);
         return R.ok();
     }
 
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @RequestMapping("/update/status")
  //   @RequiresPermissions("product:brand:update")
     public R update(@RequestBody BrandEntity brand){
 		brandService.updateById(brand);

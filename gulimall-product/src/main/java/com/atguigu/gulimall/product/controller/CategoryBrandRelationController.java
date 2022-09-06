@@ -1,15 +1,13 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.product.entity.CategoryBrandRelationEntity;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
@@ -42,6 +40,14 @@ public class CategoryBrandRelationController {
         return R.ok().put("page", page);
     }
 
+    @GetMapping("catelog/list")
+    public R cateloglist(@RequestParam Long brandId){
+        QueryWrapper<CategoryBrandRelationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("brand_id", brandId);
+        List<CategoryBrandRelationEntity> data = categoryBrandRelationService.list(queryWrapper);
+        return R.ok().put("data", data);
+    }
+
 
     /**
      * 信息
@@ -58,10 +64,9 @@ public class CategoryBrandRelationController {
      * 保存
      */
     @RequestMapping("/save")
- //   @RequiresPermissions("product:categorybrandrelation:save")
     public R save(@RequestBody CategoryBrandRelationEntity categoryBrandRelation){
-		categoryBrandRelationService.save(categoryBrandRelation);
-
+//		categoryBrandRelationService.save(categoryBrandRelation);
+        categoryBrandRelationService.saveDetail(categoryBrandRelation);
         return R.ok();
     }
 
