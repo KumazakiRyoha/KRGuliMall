@@ -7,13 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
-/**
- * 品牌分类关联
- * 
- * @author chenshun
- * @email sunlightcs@gmail.com
- * @date 2022-09-02 17:32:08
- */
+
 @Data
 @TableName("pms_category_brand_relation")
 public class CategoryBrandRelationEntity implements Serializable {

@@ -6,6 +6,7 @@ import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.atguigu.common.validator.group.AddGroup;
+import com.atguigu.common.validator.group.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -69,12 +70,18 @@ public class BrandController {
         return R.ok();
     }
 
+    @RequestMapping("update")
+    public R update(@Validated(UpdateGroup.class) @RequestBody BrandEntity brand){
+        brandService.updateByDetial(brand);
+        return R.ok();
+    }
+
     /**
      * 修改
      */
     @RequestMapping("/update/status")
  //   @RequiresPermissions("product:brand:update")
-    public R update(@RequestBody BrandEntity brand){
+    public R updateStatus(@RequestBody BrandEntity brand){
 		brandService.updateById(brand);
 
         return R.ok();

@@ -18,13 +18,7 @@ import com.atguigu.common.utils.R;
 
 
 
-/**
- * 秒杀商品通知订阅
- *
- * @author chenshun
- * @email sunlightcs@gmail.com
- * @date 2022-09-02 20:21:01
- */
+
 @RestController
 @RequestMapping("coupon/seckillskunotice")
 public class SeckillSkuNoticeController {

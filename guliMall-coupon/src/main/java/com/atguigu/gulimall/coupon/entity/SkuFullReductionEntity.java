@@ -8,13 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
-/**
- * 商品满减信息
- * 
- * @author chenshun
- * @email sunlightcs@gmail.com
- * @date 2022-09-02 20:21:01
- */
+
 @Data
 @TableName("sms_sku_full_reduction")
 public class SkuFullReductionEntity implements Serializable {

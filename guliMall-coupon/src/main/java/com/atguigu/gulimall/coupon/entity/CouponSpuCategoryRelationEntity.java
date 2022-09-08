@@ -7,13 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
-/**
- * 优惠券分类关联
- * 
- * @author chenshun
- * @email sunlightcs@gmail.com
- * @date 2022-09-02 20:21:01
- */
+
 @Data
 @TableName("sms_coupon_spu_category_relation")
 public class CouponSpuCategoryRelationEntity implements Serializable {
