@@ -3,9 +3,10 @@ package com.atguigu.gulimall.product;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.service.BrandService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
@@ -13,14 +14,16 @@ import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-class GulimallProductApplicationTests {
+public class GulimallProductApplicationTests {
 
     @Resource
     BrandService brandService;
 
+    @Resource
+    StringRedisTemplate stringRedisTemplate;
 
     @Test
-    void contextLoads() {
+    public void contextLoads() {
         BrandEntity brandEntity = new BrandEntity();
         brandEntity.setName("SONY");
         brandService.save(brandEntity);
@@ -30,6 +33,11 @@ class GulimallProductApplicationTests {
         brand_id.forEach(item -> {
             System.out.println(item);
         });
+    }
+
+    @Test
+    public void testRedis(){
+
     }
 
 }

@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient("gulimall-ware")
+@FeignClient("gulimall-wave")
 public interface WareFeignService {
-    @PostMapping("/ware/waresku/hasstock")
+    @PostMapping("/wave/waresku/hasstock")
     R getSkuHasStock(@RequestBody List<Long> skuIds);
 }
