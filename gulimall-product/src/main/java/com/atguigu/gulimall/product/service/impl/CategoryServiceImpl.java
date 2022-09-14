@@ -8,6 +8,9 @@ import com.atguigu.gulimall.product.vo.Catelog2Vo;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -84,13 +87,21 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     @Transactional
+    @CacheEvict(value = {"category"},allEntries = true)
+    /**
+     * @CacheEvict 缓存写模式
+     * 1. 同时指定多种缓存操作 @Caching
+     * 2. 指定删除某个分区下的所有数据 @CacheEvict(value = 'category',allEntries=true)
+     */
     public void updateCascae(CategoryEntity category) {
         this.updateById(category);
         categoryBrandRelationService.updateCategory(category.getCatId(),category.getName());
     }
 
+    @Cacheable(value = {"category"},key = "#root.method.name") // 当前方法的结果需要缓存。如果缓存中有，方法不用调用，如果缓存中没有，会调用方法，并将方法的结果放入缓存
     @Override
     public List<CategoryEntity> getLevel1() {
+        System.out.println("调用了方法");
         List<CategoryEntity> categoryEntities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
         return categoryEntities;
     }
@@ -132,7 +143,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
 
-    public Map<String, List<Catelog2Vo>> getCatelogJson() {
+    public Map<String, List<Catelog2Vo>> getCatelogJson2() {
         //加入缓存逻辑,缓存中存的数据是JSON字符串
         //JSON跨语言,跨平台兼容
         //从缓存中取出的数据要逆转为能用的对象类型,序列化与发序列化
@@ -141,8 +152,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             //缓存中没有数据,查询数据库
             Map<String, List<Catelog2Vo>> catelogJsonFromDb = getCatelogJsonFromDbWithRedissonLock();
             //查到的数据再放入缓存,将对象转为JSON放入缓存中
-            String s = JSON.toJSONString(catelogJsonFromDb);
-            stringRedisTemplate.opsForValue().set("catalogJSON", s, 1, TimeUnit.DAYS);
+//            String s = JSON.toJSONString(catelogJsonFromDb);
+//            stringRedisTemplate.opsForValue().set("catalogJSON", s, 1, TimeUnit.DAYS);
             return catelogJsonFromDb;
         }
         Map<String, List<Catelog2Vo>> result = JSON.parseObject(catalogJSON, new TypeReference<Map<String, List<Catelog2Vo>>>() {
@@ -235,6 +246,43 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             lock.unlock();
         }
         return dataFromDB;
+    }
+
+    @Cacheable(value = "category",key = "#root.methodName")
+    @Override
+    public Map<String, List<Catelog2Vo>> getCatelogJson() {
+        /**
+         * 优化:将数据库中的多次查询变为一次,存至缓存selectList,需要的数据从list取出,避免频繁的数据库交互
+         */
+        List<CategoryEntity> selectList = baseMapper.selectList(null);
+        //1.查出所有1级分类
+        List<CategoryEntity> level1 = getParent_cid(selectList, 0L);
+        //2.封装数据
+        Map<String, List<Catelog2Vo>> parent_cid = level1.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+                    //1.查出1级分类中所有2级分类
+                    List<CategoryEntity> categoryEntities = getParent_cid(selectList, v.getCatId());
+                    //2.封装上面的结果
+                    List<Catelog2Vo> catelog2Vos = null;
+                    if (categoryEntities != null) {
+                        catelog2Vos = categoryEntities.stream().map(l2 -> {
+                            Catelog2Vo catelog2Vo = new Catelog2Vo(v.getCatId().toString(), null, l2.getCatId().toString(), l2.getName());
+                            //查询当前2级分类的3级分类
+                            List<CategoryEntity> level3 = getParent_cid(selectList, l2.getCatId());
+                            if (level3 != null) {
+                                List<Catelog2Vo.Catelog3Vo> collect = level3.stream().map(l3 -> {
+                                    //封装指定格式
+                                    Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo(l2.getCatId().toString(), l3.getCatId().toString(), l3.getName());
+                                    return catelog3Vo;
+                                }).collect(Collectors.toList());
+                                catelog2Vo.setCatalog3List(collect);
+                            }
+                            return catelog2Vo;
+                        }).collect(Collectors.toList());
+                    }
+                    return catelog2Vos;
+                }
+        ));
+        return parent_cid;
     }
 
 
