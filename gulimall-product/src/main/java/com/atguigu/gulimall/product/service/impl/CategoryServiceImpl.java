@@ -101,7 +101,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     @Cacheable(value = {"category"},key = "#root.method.name") // 当前方法的结果需要缓存。如果缓存中有，方法不用调用，如果缓存中没有，会调用方法，并将方法的结果放入缓存
     @Override
     public List<CategoryEntity> getLevel1() {
-        System.out.println("调用了方法");
         List<CategoryEntity> categoryEntities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
         return categoryEntities;
     }

@@ -201,8 +201,8 @@
       <div class="header_banner">
         <div class="header_main_left">
           <ul>
-            <li th:each="catagory:${catagories}" >
-              <a href="/static/#" class="header_main_left_a" ctg-data="3" th:attr="ctg-data=${catagory.catId}"><b th:text="${catagory.name}"></b></a>
+            <li th:each="catagory:${categorys}" >
+              <a href="/#" class="header_main_left_a" ctg-data="3" th:attr="ctg-data=${catagory.catId}"><b th:text="${catagory.name}"></b></a>
             </li>
           </ul>
 
